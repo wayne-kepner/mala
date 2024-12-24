@@ -1,0 +1,150 @@
+// src/components/MalaCounter.tsx
+import React, { useState } from 'react';
+import { Card, CardHeader, CardContent } from './ui/card';
+
+const MalaCounter = () => {
+  const [count, setCount] = useState(0);
+  const totalBeads = 108;
+  const radius = 120;
+  const centerX = 150;
+  const centerY = 150;
+
+  const beadPositions = Array.from({ length: totalBeads }, (_, index) => {
+    const angle = (index / totalBeads) * 2 * Math.PI - Math.PI / 2;
+    return {
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle),
+      completed: index < count
+    };
+  });
+
+  const handleCount = () => {
+    if (count < totalBeads) {
+      setCount(count + 1);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full max-w-md mx-auto p-4">
+      <Card className="w-full">
+        <CardHeader className="text-center">
+          <h2 className="text-2xl font-bold">Seven Line Prayer</h2>
+          <p className="text-gray-600">Count: {count}</p>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-full aspect-square">
+            <svg viewBox="0 0 300 300" className="w-full h-full">
+              {beadPositions.map((bead, index) => (
+                <circle
+                  key={index}
+                  cx={bead.x}
+                  cy={bead.y}
+                  r={4}
+                  className={`stroke-1 ${
+                    bead.completed 
+                      ? 'fill-orange-400 stroke-orange-500'
+                      : 'fill-gray-200 stroke-gray-300'
+                  }`}
+                />
+              ))}
+            </svg>
+            <button
+              onClick={handleCount}
+              className="absolute inset-0 m-auto w-32 h-32 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              Count
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {count === totalBeads && (
+        <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-lg">
+          Mala complete! 🎉
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MalaCounter;
+
+// src/components/ui/card.tsx
+import * as React from "react"
+import { cn } from "../../lib/utils"
+
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      className
+    )}
+    {...props}
+  />
+))
+Card.displayName = "Card"
+
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
+
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
+
+export { Card, CardHeader, CardContent }
+
+// src/lib/utils.ts
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+// src/App.tsx
+import React from 'react';
+import MalaCounter from './components/MalaCounter';
+import './styles/globals.css';
+
+function App() {
+  return (
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto py-8">
+        <MalaCounter />
+      </main>
+    </div>
+  );
+}
+
+export default App;
+
+// src/index.tsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
